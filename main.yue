@@ -1,0 +1,140 @@
+
+
+
+local *
+
+
+table_shuffle = (table) ->
+    for i = #table, 2, -1
+        j = math.random i
+        table[i], table[j] = table[j], table[i]
+    return table
+
+
+
+macro PLAYER = -> "false"
+macro OPPONENT = -> "true"
+macro LIVE = -> "true"
+macro BLANK = -> "false"
+
+
+class Game
+    new: (@player_strategy = "random", @opponent_strategy = "random", @verbose = false) =>
+        @shotgun = {}
+        @player = 6
+        @opponent = 6
+        @turn = $PLAYER
+        @load!
+    load: =>
+        @shotgun[] = $LIVE for i = 1, (math.random 1, 4)
+        @shotgun[] = $BLANK for i = 1, (math.random 1, 4)
+        @shotgun = table_shuffle @shotgun
+        @turn = $PLAYER
+    shot: (target) =>
+
+
+        shooter = "Player"
+        shooter = "Opponent" if @turn == $OPPONENT
+        target_str = "Player"
+        target_str = "Opponent" if target == $OPPONENT
+
+        bullet = table.remove @shotgun
+        if bullet == $LIVE
+            if target == $PLAYER
+                @player -= 1
+            else
+                @opponent -= 1
+
+        bullet_type = "LIVE"
+        bullet_type = "BLANK" if bullet == $BLANK
+        print "#{shooter} shoots at #{target_str} with a #{bullet_type}!" if @verbose
+
+        unless bullet == $BLANK and target == @turn
+            @turn = not @turn
+        return bullet
+    step: =>
+        strategy = @player_strategy
+        strategy = @opponent_strategy if @turn == $OPPONENT
+        target = $OPPONENT
+
+        if strategy == "always_shot_opponent"
+            target = $OPPONENT
+        elseif strategy == "always_shot_self"
+            target = $PLAYER
+        else
+            target = math.random! < 0.5
+
+        target = not target if @turn == $OPPONENT
+        @shot target
+        @load! if @is_shotgun_empty!
+    is_shotgun_empty: => #@shotgun == 0
+    is_game_done: => @player == 0 or @opponent == 0
+    is_won: => @opponent == 0
+    <tostring>: =>
+        "--------------------------------------------------
+Player HP: #{@player}
+Opponent HP: #{@opponent}
+Shotgun: #{#@shotgun} bullets
+--------------------------------------------------"
+
+    
+
+
+g = Game "always_shot_self", "random", true
+
+
+-- print g
+-- -- g\step!
+-- until g\is_game_done!
+--     g\step!
+--     print g
+--     io.read!
+-- print g
+
+
+simulate_game = (player_strategy, opponent_strategy) ->
+    game = Game player_strategy, opponent_strategy
+    game\step! until game\is_game_done!
+    game\is_won!
+
+simulate_games = (count, player_strategy, opponent_strategy) ->
+    won = 0
+    total = count
+    for i = 1, total
+        if simulate_game player_strategy, opponent_strategy
+            won += 1
+    won
+
+
+all_strategies = {"random", "always_shot_opponent", "always_shot_self"}
+
+
+player_strategy_cursor = 1
+opponent_strategy_cursor = 1
+
+-- won = 0
+simulation = 10000
+
+for player_strategy_cursor = 1, #all_strategies
+    print "Player Strategy: #{all_strategies[player_strategy_cursor]}"
+    for opponent_strategy_cursor = 1, #all_strategies
+        won = simulate_games simulation, all_strategies[player_strategy_cursor], all_strategies[opponent_strategy_cursor]
+        print "#{won}/#{simulation} | (#{won/simulation*100}%) against #{all_strategies[opponent_strategy_cursor]}"
+
+
+-- print "#{won}/#{total} | (#{won/total*100}%)"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
