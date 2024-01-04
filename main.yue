@@ -14,6 +14,7 @@ table_shuffle = (table) ->
 
 macro PLAYER = -> "false"
 macro OPPONENT = -> "true"
+macro RANDOM_TARGET = -> "math.random! < 0.5"
 macro LIVE = -> "true"
 macro BLANK = -> "false"
 
@@ -61,8 +62,18 @@ class Game
             target = $OPPONENT
         elseif strategy == "always_shot_self"
             target = $PLAYER
+        elseif strategy == "smart_live"
+            target = $RANDOM_TARGET
+            target = $OPPONENT if #@shotgun == #[i for i in *@shotgun when i == $LIVE]
+        elseif strategy == "smart_blank"
+            target = $RANDOM_TARGET
+            target = $PLAYER if #@shotgun == #[i for i in *@shotgun when i == $BLANK]
+        elseif strategy == "smart_live_and_blank"
+            target = $RANDOM_TARGET
+            target = $PLAYER if #@shotgun == #[i for i in *@shotgun when i == $BLANK]
+            target = $OPPONENT if #@shotgun == #[i for i in *@shotgun when i == $LIVE]
         else
-            target = math.random! < 0.5
+            target = $RANDOM_TARGET
 
         target = not target if @turn == $OPPONENT
         @shot target
@@ -106,7 +117,7 @@ simulate_games = (count, player_strategy, opponent_strategy) ->
     won
 
 
-all_strategies = {"random", "always_shot_opponent", "always_shot_self"}
+all_strategies = {"random", "always_shot_opponent", "always_shot_self", "smart_live", "smart_blank", "smart_live_and_blank"}
 
 
 player_strategy_cursor = 1
