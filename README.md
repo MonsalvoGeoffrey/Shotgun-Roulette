@@ -11,11 +11,12 @@ Simulating the rules of the horror game [Buckshot Roulette](https://mikeklubnika
 - Shot Self only blanks
 - Shot Opponent only live
 - Shot Self only blanks AND Shot Opponent only live
+- Shot Self when more blanks than live
+- Shot Opponent when more or equal blanks than live
 
 ### Planned strategy
 
-- Shot Self when more blanks than live
-- Shot Opponent when more or equal blanks than live
+- Unknown
 
 ---
 

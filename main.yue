@@ -72,6 +72,16 @@ class Game
             target = $RANDOM_TARGET
             target = $PLAYER if #@shotgun == #[i for i in *@shotgun when i == $BLANK]
             target = $OPPONENT if #@shotgun == #[i for i in *@shotgun when i == $LIVE]
+        elseif strategy == "probability_live"
+            target = $RANDOM_TARGET
+            target = $OPPONENT if (#@shotgun / 2) <= #[i for i in *@shotgun when i == $LIVE]
+        elseif strategy == "probability_blank"
+            target = $RANDOM_TARGET
+            target = $PLAYER if (#@shotgun / 2) < #[i for i in *@shotgun when i == $BLANK]
+        elseif strategy == "probability_live_and_blank"
+            target = $RANDOM_TARGET
+            target = $OPPONENT if (#@shotgun / 2) <= #[i for i in *@shotgun when i == $LIVE]
+            target = $PLAYER if (#@shotgun / 2) < #[i for i in *@shotgun when i == $BLANK]
         else
             target = $RANDOM_TARGET
 
@@ -117,7 +127,7 @@ simulate_games = (count, player_strategy, opponent_strategy) ->
     won
 
 
-all_strategies = {"random", "always_shot_opponent", "always_shot_self", "smart_live", "smart_blank", "smart_live_and_blank"}
+all_strategies = {"random", "always_shot_opponent", "always_shot_self", "smart_live", "smart_blank", "smart_live_and_blank", "probability_live", "probability_blank", "probability_live_and_blank"}
 
 
 player_strategy_cursor = 1
