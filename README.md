@@ -16,7 +16,7 @@ Simulating the rules of the horror game [Buckshot Roulette](https://mikeklubnika
 
 ### Planned strategy
 
-- Unknown
+- Minmax
 
 ---
 
