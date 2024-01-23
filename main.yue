@@ -19,6 +19,66 @@ macro LIVE = -> "true"
 macro BLANK = -> "false"
 
 
+
+    if live == 4 and blank == 4
+    elseif live == 4 and blank == 3
+    elseif live == 4 and blank == 2
+    elseif live == 4 and blank == 1
+    elseif live == 4 and blank == 0 -- 0% safe | 100% deadly
+        return $OPPONENT
+    
+    elseif live == 3 and blank == 4
+    elseif live == 3 and blank == 3
+    elseif live == 3 and blank == 2
+    elseif live == 3 and blank == 1
+    elseif live == 3 and blank == 0 -- 0% safe | 100% deadly
+        return $OPPONENT
+
+    elseif live == 2 and blank == 4
+    elseif live == 2 and blank == 3
+    elseif live == 2 and blank == 2
+    elseif live == 2 and blank == 1
+    elseif live == 2 and blank == 0 -- 0% safe | 100% deadly
+        return $OPPONENT
+
+    elseif live == 1 and blank == 4
+    elseif live == 1 and blank == 3 -- 50% safe | 9% deadly
+        -- if self:
+        -- -- 75% * 67% = 50%
+        -- if opponent:
+        -- -- 25% * 33% = 9%
+        return $PLAYER
+    elseif live == 1 and blank == 2 -- 33% safe | 67% deadly
+        -- If self:
+        -- -- 67% safe
+        -- -- -- 67% * 50% = 33% to hit
+        -- -- 33% deadly
+        -- -- -- Cannot hit
+        -- If opponent:
+        -- -- 33% to hit
+        -- -- -- Cannot be hit
+        -- -- 67% to miss
+        -- -- -- 67% * 50% = 33% to be hit
+        -- -- -- -- 100% to hit
+        return $OPPONENT
+    elseif live == 1 and blank == 1 -- 50% safe | 50% deadly
+        return $OPPONENT
+    elseif live == 1 and blank == 0 -- 0% safe | 100% deadly
+        return $OPPONENT
+
+    elseif live == 0 and blank == 4 -- 100% safe | 0% deadly
+        return $PLAYER
+    elseif live == 0 and blank == 3 -- 100% safe | 0% deadly
+        return $PLAYER
+    elseif live == 0 and blank == 2 -- 100% safe | 0% deadly
+        return $PLAYER
+    elseif live == 0 and blank == 1 -- 100% safe | 0% deadly
+        return $PLAYER
+    elseif live == 0 and blank == 0 -- Never happens
+        return $OPPONENT
+
+
+
 class Game
     new: (@player_strategy = "random", @opponent_strategy = "random", @verbose = false) =>
         @shotgun = {}
@@ -82,6 +142,10 @@ class Game
             target = $RANDOM_TARGET
             target = $OPPONENT if (#@shotgun / 2) <= #[i for i in *@shotgun when i == $LIVE]
             target = $PLAYER if (#@shotgun / 2) < #[i for i in *@shotgun when i == $BLANK]
+        elseif strategy == "dealer"
+            target = $RANDOM_TARGET
+            target = $PLAYER if #@shotgun == 1 and @shotgun[1] == $BLANK
+            target = $OPPONENT if #@shotgun == 1 and @shotgun[1] == $LIVE
         else
             target = $RANDOM_TARGET
 
@@ -101,17 +165,6 @@ Shotgun: #{#@shotgun} bullets
     
 
 
-g = Game "always_shot_self", "random", true
-
-
--- print g
--- -- g\step!
--- until g\is_game_done!
---     g\step!
---     print g
---     io.read!
--- print g
-
 
 simulate_game = (player_strategy, opponent_strategy) ->
     game = Game player_strategy, opponent_strategy
@@ -127,13 +180,13 @@ simulate_games = (count, player_strategy, opponent_strategy) ->
     won
 
 
-all_strategies = {"random", "always_shot_opponent", "always_shot_self", "smart_live", "smart_blank", "smart_live_and_blank", "probability_live", "probability_blank", "probability_live_and_blank"}
+all_strategies = {"random", "always_shot_opponent", "always_shot_self", "smart_live", "smart_blank", "smart_live_and_blank", "probability_live", "probability_blank", "probability_live_and_blank", "dealer"}
 
 
 player_strategy_cursor = 1
 opponent_strategy_cursor = 1
 
--- won = 0
+
 simulation = 10000
 
 for player_strategy_cursor = 1, #all_strategies
@@ -143,7 +196,6 @@ for player_strategy_cursor = 1, #all_strategies
         print "#{won}/#{simulation} | (#{won/simulation*100}%) against #{all_strategies[opponent_strategy_cursor]}"
 
 
--- print "#{won}/#{total} | (#{won/total*100}%)"
 
 
 
